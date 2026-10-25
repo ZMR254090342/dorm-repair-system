@@ -1,0 +1,6 @@
+{"cases":[
+  {"id":1,"priority":"p0","description":"访问登录页，预期显示登录表单（用户名、密码输入框和登录按钮）","identity":{"mode":"anon"}},
+  {"id":2,"priority":"p0","description":"访问注册页，预期显示学生注册表单（用户名、密码、真实姓名等字段）","identity":{"mode":"anon"}},
+  {"id":3,"priority":"p1","description":"访问登录页后点击注册链接，预期跳转到注册页面","identity":{"mode":"anon"}},
+  {"id":4,"priority":"p1","description":"注册页表单验证：空提交时显示错误提示","identity":{"mode":"anon"}}
+]}
