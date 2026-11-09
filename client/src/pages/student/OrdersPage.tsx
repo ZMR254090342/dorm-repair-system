@@ -47,16 +47,7 @@ import {
   type RepairOrder,
   type OrderListResponse,
 } from '@shared/api.interface';
-
-const STATUS_VARIANTS: Record<OrderStatus, string> = {
-  pending_review: 'bg-amber-100 text-amber-700 border-amber-200',
-  pending_repair: 'bg-blue-100 text-blue-700 border-blue-200',
-  repairing: 'bg-indigo-100 text-indigo-700 border-indigo-200',
-  pending_review_done: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  completed: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  rejected: 'bg-red-100 text-red-700 border-red-200',
-  cancelled: 'bg-slate-100 text-slate-600 border-slate-200',
-};
+import { STATUS_BADGE_CLASS } from '@client/src/lib/order-status';
 
 const PAGE_SIZE = 10;
 
@@ -173,8 +164,9 @@ const OrdersPage: React.FC = () => {
             </div>
           ) : data.items.length === 0 ? (
             <div className="py-16 text-center text-muted-foreground">
-              <ClipboardList className="w-10 h-10 mx-auto mb-2 opacity-30" />
-              <p>暂无工单记录</p>
+              <ClipboardList className="w-12 h-12 mx-auto mb-3 opacity-30" />
+              <p className="text-base">暂无报修工单</p>
+              <p className="text-sm mt-1 opacity-70">点击"提交报修"发起您的第一次报修</p>
             </div>
           ) : (
             <>
@@ -189,8 +181,8 @@ const OrdersPage: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {data.items.map((order: RepairOrder) => (
-                    <TableRow key={order.id}>
+                  {data.items.map((order: RepairOrder, idx: number) => (
+                    <TableRow key={order.id} className={idx % 2 === 1 ? 'bg-slate-50/60' : ''}>
                       <TableCell className="font-medium">
                         {order.orderNo}
                       </TableCell>
@@ -200,7 +192,7 @@ const OrdersPage: React.FC = () => {
                       <TableCell>
                         <Badge
                           variant="outline"
-                          className={STATUS_VARIANTS[order.status]}
+                          className={STATUS_BADGE_CLASS[order.status]}
                         >
                           {ORDER_STATUS_LABELS[order.status]}
                         </Badge>

@@ -13,7 +13,7 @@ import {
   type RepairOrder,
   type OrderStatus,
 } from '@shared/api.interface';
-import { STATUS_VARIANTS } from './status-utils';
+import { STATUS_BADGE_CLASS, STATUS_BADGE_VARIANT } from '@client/src/lib/order-status';
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
@@ -142,7 +142,6 @@ const DashboardPage: React.FC = () => {
           ) : (
             <div className="space-y-2">
               {recentOrders.map((order) => {
-                const sv = STATUS_VARIANTS[order.status];
                 return (
                   <Link
                     key={order.id}
@@ -163,7 +162,7 @@ const DashboardPage: React.FC = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
-                      <Badge variant={sv.variant} className={sv.className}>
+                      <Badge variant={STATUS_BADGE_VARIANT[order.status]} className={STATUS_BADGE_CLASS[order.status]}>
                         {ORDER_STATUS_LABELS[order.status]}
                       </Badge>
                       <div className="text-sm text-muted-foreground flex items-center gap-1">

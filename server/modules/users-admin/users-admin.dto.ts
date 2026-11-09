@@ -30,6 +30,7 @@ export class CreateUserDto implements CreateUserRequest {
   @IsString()
   realName!: string;
 
+  @Type(() => String)
   @IsString()
   @IsIn(ROLES)
   role!: UserRole;
@@ -49,10 +50,7 @@ export class CreateUserDto implements CreateUserRequest {
 
 export class UpdateUserDto implements UpdateUserRequest {
   @IsOptional()
-  @IsString()
-  realName?: string;
-
-  @IsOptional()
+  @Type(() => String)
   @IsString()
   @IsIn(ROLES)
   role?: UserRole;
@@ -62,6 +60,7 @@ export class UpdateUserDto implements UpdateUserRequest {
   phone?: string;
 
   @IsOptional()
+  @Type(() => String)
   @IsString()
   @IsIn(STATUSES)
   status?: UserStatus;
@@ -83,11 +82,13 @@ export class ResetPasswordDto implements ResetPasswordRequest {
 
 export class UserListQueryDto {
   @IsOptional()
+  @Type(() => String)
   @IsString()
   @IsIn(ROLES)
   role?: UserRole;
 
   @IsOptional()
+  @Type(() => String)
   @IsString()
   keyword?: string;
 

@@ -31,6 +31,7 @@ export class CreateOrderDto implements CreateOrderRequest {
   @IsString()
   dormRoom!: string;
 
+  @Type(() => String)
   @IsString()
   @IsIn(FAULT_TYPES)
   faultType!: FaultType;
@@ -41,6 +42,7 @@ export class CreateOrderDto implements CreateOrderRequest {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
+  @Type(() => String)
   faultImages?: string[];
 }
 
@@ -85,11 +87,13 @@ export class CreateReviewDto implements CreateReviewRequest {
 
 export class OrderListQueryDto {
   @IsOptional()
+  @Type(() => String)
   @IsString()
   @IsIn(STATUS_VALUES)
   status?: OrderStatus;
 
   @IsOptional()
+  @Type(() => String)
   @IsString()
   @IsIn(FAULT_TYPES)
   faultType?: FaultType;

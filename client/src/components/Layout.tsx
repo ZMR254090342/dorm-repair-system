@@ -56,6 +56,51 @@ const getRoleHome = (role: string): string => {
   }
 };
 
+const getRoleTheme = (role: string): { accent: string; bg: string; border: string; activeBg: string; activeText: string } => {
+  switch (role) {
+    case 'student':
+      return {
+        accent: 'from-emerald-500 to-teal-500',
+        bg: 'bg-emerald-50/40',
+        border: 'border-emerald-100',
+        activeBg: 'bg-emerald-100',
+        activeText: 'text-emerald-700',
+      };
+    case 'repairer':
+      return {
+        accent: 'from-orange-500 to-amber-500',
+        bg: 'bg-orange-50/40',
+        border: 'border-orange-100',
+        activeBg: 'bg-orange-100',
+        activeText: 'text-orange-700',
+      };
+    case 'admin':
+      return {
+        accent: 'from-blue-500 to-indigo-500',
+        bg: 'bg-blue-50/40',
+        border: 'border-blue-100',
+        activeBg: 'bg-blue-100',
+        activeText: 'text-blue-700',
+      };
+    case 'super_admin':
+      return {
+        accent: 'from-indigo-500 to-purple-500',
+        bg: 'bg-indigo-50/40',
+        border: 'border-indigo-100',
+        activeBg: 'bg-indigo-100',
+        activeText: 'text-indigo-700',
+      };
+    default:
+      return {
+        accent: 'from-primary to-primary/80',
+        bg: 'bg-primary/5',
+        border: 'border-primary/10',
+        activeBg: 'bg-primary/10',
+        activeText: 'text-primary',
+      };
+  }
+};
+
 const Layout = () => {
   const navigate = useNavigate();
   const { user, isLoading, logout } = useAuth();
@@ -74,6 +119,7 @@ const Layout = () => {
   }
 
   const navItems = getNavItems(user.role);
+  const theme = getRoleTheme(user.role);
 
   const handleLogout = async () => {
     await logout();
@@ -82,10 +128,11 @@ const Layout = () => {
 
   return (
     <div className="flex h-screen bg-slate-50">
-      <aside className="w-60 bg-white border-r border-slate-200 flex flex-col">
+      <aside className={`w-60 bg-white border-r ${theme.border} flex flex-col`}>
+        <div className={`h-1.5 bg-gradient-to-r ${theme.accent}`} />
         <div className="h-16 flex items-center px-5 border-b border-slate-100">
-          <ShieldCheck className="w-7 h-7 text-primary mr-2" />
-          <span className="font-semibold text-lg">宿舍报修系统</span>
+          <ShieldCheck className={`w-7 h-7 ${theme.activeText} mr-2`} />
+          <span className="font-semibold text-lg text-slate-800">宿舍报修系统</span>
         </div>
 
         <nav className="flex-1 p-3 space-y-1">
@@ -98,7 +145,7 @@ const Layout = () => {
                 to={item.to}
                 className={`flex items-center px-3 py-2.5 rounded-lg text-sm transition-colors ${
                   isActive
-                    ? 'bg-primary/10 text-primary font-medium'
+                    ? `${theme.activeBg} ${theme.activeText} font-medium`
                     : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                 }`}
               >

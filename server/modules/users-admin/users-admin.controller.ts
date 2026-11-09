@@ -25,7 +25,7 @@ export class UsersAdminController {
     @Req() req: Request,
     @Query() query: UserListQueryDto,
   ): Promise<UserListResponse> {
-    this.authService.requireUser(req, ['super_admin']);
+    await this.authService.requireUserVerified(req, ['super_admin']);
     return this.usersAdminService.listUsers({
       role: query.role,
       keyword: query.keyword,
@@ -36,13 +36,13 @@ export class UsersAdminController {
 
   @Get(':id')
   async getUser(@Req() req: Request, @Param('id') id: string): Promise<UserInfo> {
-    this.authService.requireUser(req, ['super_admin']);
+    await this.authService.requireUserVerified(req, ['super_admin']);
     return this.usersAdminService.getUser(id);
   }
 
   @Post()
   async createUser(@Req() req: Request, @Body() dto: CreateUserDto): Promise<UserInfo> {
-    this.authService.requireUser(req, ['super_admin']);
+    await this.authService.requireUserVerified(req, ['super_admin']);
     return this.usersAdminService.createUser(dto);
   }
 
@@ -52,7 +52,7 @@ export class UsersAdminController {
     @Param('id') id: string,
     @Body() dto: UpdateUserDto,
   ): Promise<UserInfo> {
-    this.authService.requireUser(req, ['super_admin']);
+    await this.authService.requireUserVerified(req, ['super_admin']);
     return this.usersAdminService.updateUser(id, dto);
   }
 
@@ -62,13 +62,13 @@ export class UsersAdminController {
     @Param('id') id: string,
     @Body() dto: ResetPasswordDto,
   ): Promise<{ success: true }> {
-    this.authService.requireUser(req, ['super_admin']);
+    await this.authService.requireUserVerified(req, ['super_admin']);
     return this.usersAdminService.resetPassword(id, dto.newPassword);
   }
 
   @Delete(':id')
   async deleteUser(@Req() req: Request, @Param('id') id: string): Promise<{ success: true }> {
-    this.authService.requireUser(req, ['super_admin']);
+    await this.authService.requireUserVerified(req, ['super_admin']);
     return this.usersAdminService.deleteUser(id);
   }
 }

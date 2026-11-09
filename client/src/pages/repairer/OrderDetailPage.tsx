@@ -24,7 +24,7 @@ import {
   type ReviewInfo,
   type OrderStatus,
 } from '@shared/api.interface';
-import { STATUS_VARIANTS } from './status-utils';
+import { STATUS_BADGE_CLASS } from '@client/src/lib/order-status';
 
 const TIMELINE_STEPS: OrderStatus[] = [
   'pending_review',
@@ -52,6 +52,8 @@ const OrderDetailPage: React.FC = () => {
   const [repairNote, setRepairNote] = useState('');
   const [repairResult, setRepairResult] = useState('');
   const [submitting, setSubmitting] = useState(false);
+
+  const statusVariant = (status: OrderStatus) => STATUS_BADGE_CLASS[status];
 
   const loadData = async () => {
     if (!id) return;
@@ -138,7 +140,7 @@ const OrderDetailPage: React.FC = () => {
     );
   }
 
-  const sv = STATUS_VARIANTS[order.status];
+  const sv = statusVariant(order.status);
   const currentStepIdx = getCurrentStepIndex(order.status);
   const showAction =
     order.status === 'pending_repair' || order.status === 'repairing';
@@ -161,7 +163,7 @@ const OrderDetailPage: React.FC = () => {
             <h1 className="text-2xl font-bold text-slate-900">
               {order.orderNo}
             </h1>
-            <Badge variant={sv.variant} className={sv.className}>
+            <Badge variant="outline" className={sv}>
               {ORDER_STATUS_LABELS[order.status]}
             </Badge>
           </div>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import {

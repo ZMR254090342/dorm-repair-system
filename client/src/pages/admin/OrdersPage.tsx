@@ -13,6 +13,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@client/src/components/ui/card';
 import { Button } from '@client/src/components/ui/button';
 import { Badge } from '@client/src/components/ui/badge';
+import { ClipboardList } from 'lucide-react';
 import {
   Select,
   SelectTrigger,
@@ -28,16 +29,7 @@ import {
   TableCell,
   TableHead,
 } from '@client/src/components/ui/table';
-
-const STATUS_VARIANTS: Record<OrderStatus, string> = {
-  pending_review: 'bg-amber-100 text-amber-700 border-amber-200',
-  pending_repair: 'bg-blue-100 text-blue-700 border-blue-200',
-  repairing: 'bg-indigo-100 text-indigo-700 border-indigo-200',
-  pending_review_done: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  completed: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  rejected: 'bg-red-100 text-red-700 border-red-200',
-  cancelled: 'bg-slate-100 text-slate-600 border-slate-200',
-};
+import { STATUS_BADGE_CLASS } from '@client/src/lib/order-status';
 
 const OrdersPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -172,8 +164,9 @@ const OrdersPage: React.FC = () => {
               加载中...
             </div>
           ) : orders.length === 0 ? (
-            <div className="flex items-center justify-center h-64 text-muted-foreground">
-              暂无工单数据
+            <div className="py-16 text-center text-muted-foreground">
+              <ClipboardList className="w-12 h-12 mx-auto mb-3 opacity-30" />
+              <p className="text-base">暂无报修工单</p>
             </div>
           ) : (
             <>
@@ -190,15 +183,15 @@ const OrdersPage: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {orders.map((order) => (
-                    <TableRow key={order.id}>
+                  {orders.map((order, idx: number) => (
+                    <TableRow key={order.id} className={idx % 2 === 1 ? 'bg-slate-50/60' : ''}>
                       <TableCell className="font-mono text-xs">{order.orderNo}</TableCell>
                       <TableCell>{`${order.dormBuilding} ${order.dormRoom}`}</TableCell>
                       <TableCell>{FAULT_TYPE_LABELS[order.faultType as FaultType]}</TableCell>
                       <TableCell>
                         <Badge
                           variant="outline"
-                          className={STATUS_VARIANTS[order.status as OrderStatus]}
+                          className={STATUS_BADGE_CLASS[order.status as OrderStatus]}
                         >
                           {ORDER_STATUS_LABELS[order.status as OrderStatus]}
                         </Badge>

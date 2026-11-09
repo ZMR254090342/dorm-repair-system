@@ -10,6 +10,7 @@ import {
   BarChart3,
 } from 'lucide-react';
 import { ordersApi } from '@client/src/api';
+import { STATUS_BADGE_CLASS } from '@client/src/lib/order-status';
 import {
   FAULT_TYPE_LABELS,
   ORDER_STATUS_LABELS,
@@ -27,17 +28,6 @@ import {
   TableCell,
   TableHead,
 } from '@client/src/components/ui/table';
-
-const STATUS_VARIANTS: Record<OrderStatus, string> = {
-  pending_review: 'bg-amber-100 text-amber-700 border-amber-200',
-  pending_repair: 'bg-blue-100 text-blue-700 border-blue-200',
-  repairing: 'bg-indigo-100 text-indigo-700 border-indigo-200',
-  pending_review_done: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  completed: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  rejected: 'bg-red-100 text-red-700 border-red-200',
-  cancelled: 'bg-slate-100 text-slate-600 border-slate-200',
-};
-
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -216,7 +206,7 @@ const DashboardPage: React.FC = () => {
                     <TableCell>
                       <Badge
                         variant="outline"
-                        className={STATUS_VARIANTS[order.status]}
+                        className={STATUS_BADGE_CLASS[order.status]}
                       >
                         {ORDER_STATUS_LABELS[order.status]}
                       </Badge>

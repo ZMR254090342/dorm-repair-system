@@ -14,22 +14,13 @@ import { Button } from '@client/src/components/ui/button';
 import { Badge } from '@client/src/components/ui/badge';
 import { useAuth } from '@client/src/contexts/AuthContext';
 import { ordersApi } from '@client/src/api';
+import { STATUS_BADGE_CLASS } from '@client/src/lib/order-status';
 import {
   FAULT_TYPE_LABELS,
   ORDER_STATUS_LABELS,
   type OrderStatus,
   type RepairOrder,
 } from '@shared/api.interface';
-
-const STATUS_VARIANTS: Record<OrderStatus, string> = {
-  pending_review: 'bg-amber-100 text-amber-700 border-amber-200',
-  pending_repair: 'bg-blue-100 text-blue-700 border-blue-200',
-  repairing: 'bg-indigo-100 text-indigo-700 border-indigo-200',
-  pending_review_done: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  completed: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-  rejected: 'bg-red-100 text-red-700 border-red-200',
-  cancelled: 'bg-slate-100 text-slate-600 border-slate-200',
-};
 
 const PENDING_STATUSES: OrderStatus[] = [
   'pending_review',
@@ -193,7 +184,7 @@ const DashboardPage: React.FC = () => {
                     <div className="text-right">
                       <Badge
                         variant="outline"
-                        className={STATUS_VARIANTS[order.status]}
+                        className={STATUS_BADGE_CLASS[order.status]}
                       >
                         {ORDER_STATUS_LABELS[order.status]}
                       </Badge>

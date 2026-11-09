@@ -13,7 +13,7 @@ export class StatsController {
 
   @Get('orders')
   async getOrderStats(@Req() req: Request): Promise<OrderStatsResponse> {
-    this.authService.requireUser(req, ['admin', 'super_admin']);
+    await this.authService.requireUserVerified(req, ['admin', 'super_admin']);
     return this.statsService.getOrderStats();
   }
 }

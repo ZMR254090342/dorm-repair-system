@@ -26,7 +26,7 @@ export class OrdersController {
 
   @Post()
   async createOrder(@Req() req: Request, @Body() dto: CreateOrderDto): Promise<RepairOrder> {
-    const { userId, role } = this.authService.requireUser(req, ['student']);
+    const { userId, role } = await this.authService.requireUserVerified(req, ['student']);
     return this.ordersService.createOrder(userId, dto);
   }
 
@@ -35,7 +35,7 @@ export class OrdersController {
     @Req() req: Request,
     @Query() query: OrderListQueryDto,
   ): Promise<OrderListResponse> {
-    const { userId, role } = this.authService.requireUser(req);
+    const { userId, role } = await this.authService.requireUserVerified(req);
     return this.ordersService.listOrders({
       role,
       userId,
@@ -48,13 +48,13 @@ export class OrdersController {
 
   @Get('repairers')
   async listRepairers(@Req() req: Request): Promise<Array<{ id: string; realName: string; phone?: string }>> {
-    this.authService.requireUser(req, ['admin']);
+    await this.authService.requireUserVerified(req, ['admin', 'super_admin']);
     return this.ordersService.listRepairers();
   }
 
   @Get(':id')
   async getOrderDetail(@Req() req: Request, @Param('id') id: string): Promise<RepairOrder> {
-    const { userId, role } = this.authService.requireUser(req);
+    const { userId, role } = await this.authService.requireUserVerified(req);
     if (role === 'student' || role === 'repairer') {
       await this.ordersService.checkOrderPermission(id, userId, role as UserRole);
     }
@@ -67,7 +67,7 @@ export class OrdersController {
     @Param('id') id: string,
     @Body() dto: AssignOrderDto,
   ): Promise<RepairOrder> {
-    this.authService.requireUser(req, ['admin', 'super_admin']);
+    await this.authService.requireUserVerified(req, ['admin', 'super_admin']);
     return this.ordersService.assignOrder(id, dto.repairerId);
   }
 
@@ -77,7 +77,7 @@ export class OrdersController {
     @Param('id') id: string,
     @Body() dto: RejectOrderDto,
   ): Promise<RepairOrder> {
-    this.authService.requireUser(req, ['admin', 'super_admin']);
+    await this.authService.requireUserVerified(req, ['admin', 'super_admin']);
     return this.ordersService.rejectOrder(id, dto.rejectReason);
   }
 
@@ -87,25 +87,25 @@ export class OrdersController {
     @Param('id') id: string,
     @Body() dto: UpdateOrderStatusDto,
   ): Promise<RepairOrder> {
-    const { userId } = this.authService.requireUser(req, ['repairer']);
+    const { userId } = await this.authService.requireUserVerified(req, ['repairer']);
     return this.ordersService.updateOrderStatus(id, userId, dto);
   }
 
   @Patch(':id/cancel')
   async cancelOrder(@Req() req: Request, @Param('id') id: string): Promise<RepairOrder> {
-    const { userId } = this.authService.requireUser(req, ['student']);
+    const { userId } = await this.authService.requireUserVerified(req, ['student']);
     return this.ordersService.cancelOrder(id, userId);
   }
 
   @Post('review')
   async createReview(@Req() req: Request, @Body() dto: CreateReviewDto): Promise<ReviewInfo> {
-    const { userId } = this.authService.requireUser(req, ['student']);
+    const { userId } = await this.authService.requireUserVerified(req, ['student']);
     return this.ordersService.createReview(userId, dto);
   }
 
   @Get(':id/review')
   async getOrderReview(@Req() req: Request, @Param('id') id: string): Promise<{ review: ReviewInfo | null }> {
-    const { userId, role } = this.authService.requireUser(req);
+    const { userId, role } = await this.authService.requireUserVerified(req);
     if (role === 'student' || role === 'repairer') {
       await this.ordersService.checkOrderPermission(id, userId, role as UserRole);
     }

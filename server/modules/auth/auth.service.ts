@@ -96,10 +96,31 @@ export class AuthService {
     if (!session) {
       throw new UnauthorizedException('请先登录');
     }
-    if (allowedRoles && !allowedRoles.includes(session.role)) {
+    return { userId: session.userId, role: session.role };
+  }
+
+  async requireUserVerified(req: Request, allowedRoles?: UserRole[]): Promise<{ userId: string; role: UserRole }> {
+    const session = this.getSessionData(req);
+    if (!session) {
+      throw new UnauthorizedException('请先登录');
+    }
+    const userList = await this.db
+      .select()
+      .from(users)
+      .where(eq(users.id, session.userId))
+      .limit(1);
+    if (userList.length === 0) {
+      throw new UnauthorizedException('用户不存在');
+    }
+    const user = userList[0];
+    if (user.status !== 'active') {
+      throw new UnauthorizedException('账号已被禁用');
+    }
+    const role = user.role as UserRole;
+    if (allowedRoles && !allowedRoles.includes(role)) {
       throw new UnauthorizedException('权限不足');
     }
-    return session;
+    return { userId: user.id, role };
   }
 
   private mapToUserInfo(user: typeof users.$inferSelect): UserInfo {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Eye, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Eye, ChevronLeft, ChevronRight, ClipboardList } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/src/components/ui/card';
 import { Button } from '@client/src/components/ui/button';
 import { Badge } from '@client/src/components/ui/badge';
@@ -27,7 +27,7 @@ import {
   type RepairOrder,
   type OrderStatus,
 } from '@shared/api.interface';
-import { STATUS_VARIANTS } from './status-utils';
+import { STATUS_BADGE_CLASS } from '@client/src/lib/order-status';
 
 const STATUS_FILTERS: { value: string; label: string }[] = [
   { value: '', label: '全部' },
@@ -117,8 +117,9 @@ const OrdersPage: React.FC = () => {
               <div className="text-muted-foreground">加载中...</div>
             </div>
           ) : orders.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              暂无工单数据
+            <div className="py-12 text-center text-muted-foreground">
+              <ClipboardList className="w-12 h-12 mx-auto mb-3 opacity-30" />
+              <p className="text-base">暂无报修工单</p>
             </div>
           ) : (
             <>
@@ -134,10 +135,10 @@ const OrdersPage: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {orders.map((order) => {
-                    const sv = STATUS_VARIANTS[order.status as OrderStatus];
+                  {orders.map((order, idx: number) => {
+                    const cls = STATUS_BADGE_CLASS[order.status as OrderStatus];
                     return (
-                      <TableRow key={order.id}>
+                      <TableRow key={order.id} className={idx % 2 === 1 ? 'bg-slate-50/60' : ''}>
                         <TableCell className="font-medium">
                           {order.orderNo}
                         </TableCell>
@@ -148,7 +149,7 @@ const OrdersPage: React.FC = () => {
                           {order.dormBuilding} {order.dormRoom}
                         </TableCell>
                         <TableCell>
-                          <Badge variant={sv.variant} className={sv.className}>
+                          <Badge variant="outline" className={cls}>
                             {ORDER_STATUS_LABELS[order.status as OrderStatus]}
                           </Badge>
                         </TableCell>

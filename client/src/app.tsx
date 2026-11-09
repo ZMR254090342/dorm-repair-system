@@ -19,6 +19,7 @@ import AdminOrdersPage from '@client/src/pages/admin/OrdersPage';
 import AdminOrderDetailPage from '@client/src/pages/admin/OrderDetailPage';
 import AdminStatsPage from '@client/src/pages/admin/StatsPage';
 import SuperUsersPage from '@client/src/pages/super/UsersPage';
+import RoleGuard from '@client/src/components/RoleGuard';
 
 const RoleRedirect = () => {
   const { user, isLoading } = useAuth();
@@ -44,21 +45,69 @@ const App = () => {
             <Route element={<Layout />}>
               <Route index element={<RoleRedirect />} />
 
-              <Route path="student/dashboard" element={<StudentDashboardPage />} />
-              <Route path="student/submit" element={<StudentSubmitPage />} />
-              <Route path="student/orders" element={<StudentOrdersPage />} />
-              <Route path="student/orders/:id" element={<StudentOrderDetailPage />} />
+              <Route path="student/dashboard" element={
+                <RoleGuard allowedRoles={['student']}>
+                  <StudentDashboardPage />
+                </RoleGuard>
+              } />
+              <Route path="student/submit" element={
+                <RoleGuard allowedRoles={['student']}>
+                  <StudentSubmitPage />
+                </RoleGuard>
+              } />
+              <Route path="student/orders" element={
+                <RoleGuard allowedRoles={['student']}>
+                  <StudentOrdersPage />
+                </RoleGuard>
+              } />
+              <Route path="student/orders/:id" element={
+                <RoleGuard allowedRoles={['student']}>
+                  <StudentOrderDetailPage />
+                </RoleGuard>
+              } />
 
-              <Route path="repairer/dashboard" element={<RepairerDashboardPage />} />
-              <Route path="repairer/orders" element={<RepairerOrdersPage />} />
-              <Route path="repairer/orders/:id" element={<RepairerOrderDetailPage />} />
+              <Route path="repairer/dashboard" element={
+                <RoleGuard allowedRoles={['repairer']}>
+                  <RepairerDashboardPage />
+                </RoleGuard>
+              } />
+              <Route path="repairer/orders" element={
+                <RoleGuard allowedRoles={['repairer']}>
+                  <RepairerOrdersPage />
+                </RoleGuard>
+              } />
+              <Route path="repairer/orders/:id" element={
+                <RoleGuard allowedRoles={['repairer']}>
+                  <RepairerOrderDetailPage />
+                </RoleGuard>
+              } />
 
-              <Route path="admin/dashboard" element={<AdminDashboardPage />} />
-              <Route path="admin/orders" element={<AdminOrdersPage />} />
-              <Route path="admin/orders/:id" element={<AdminOrderDetailPage />} />
-              <Route path="admin/stats" element={<AdminStatsPage />} />
+              <Route path="admin/dashboard" element={
+                <RoleGuard allowedRoles={['admin', 'super_admin']}>
+                  <AdminDashboardPage />
+                </RoleGuard>
+              } />
+              <Route path="admin/orders" element={
+                <RoleGuard allowedRoles={['admin', 'super_admin']}>
+                  <AdminOrdersPage />
+                </RoleGuard>
+              } />
+              <Route path="admin/orders/:id" element={
+                <RoleGuard allowedRoles={['admin', 'super_admin']}>
+                  <AdminOrderDetailPage />
+                </RoleGuard>
+              } />
+              <Route path="admin/stats" element={
+                <RoleGuard allowedRoles={['admin', 'super_admin']}>
+                  <AdminStatsPage />
+                </RoleGuard>
+              } />
 
-              <Route path="super/users" element={<SuperUsersPage />} />
+              <Route path="super/users" element={
+                <RoleGuard allowedRoles={['super_admin']}>
+                  <SuperUsersPage />
+                </RoleGuard>
+              } />
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />
