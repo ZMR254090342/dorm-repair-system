@@ -119,6 +119,7 @@ export interface OrderStatsResponse {
   pending: number;
   repairing: number;
   byFaultType: { type: FaultType; count: number }[];
+  byStatus: { status: OrderStatus; count: number }[];
   byRepairer: { repairerId: string; repairerName: string; count: number }[];
 }
 

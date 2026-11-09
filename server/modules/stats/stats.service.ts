@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Inject } from '@nestjs/common';
 import { DRIZZLE_DATABASE, type PostgresJsDatabase } from '@lark-apaas/fullstack-nestjs-core';
-import { eq, count, and, isNotNull } from 'drizzle-orm';
+import { eq, count, and, isNotNull, inArray } from 'drizzle-orm';
 import { sql } from 'drizzle-orm';
 
 import { repairOrders, users } from '@server/database/schema';
-import type { OrderStatsResponse, FaultType } from '@shared/api.interface';
+import type { OrderStatsResponse, FaultType, OrderStatus } from '@shared/api.interface';
 
 @Injectable()
 export class StatsService {
@@ -24,9 +24,7 @@ export class StatsService {
     const pendingResult = await this.db
       .select({ count: count() })
       .from(repairOrders)
-      .where(
-        sql`${repairOrders.status} IN ${sql.raw(`('pending_review', 'pending_repair')`)}`,
-      );
+      .where(inArray(repairOrders.status, ['pending_review', 'pending_repair']));
     const pending = Number(pendingResult[0]?.count ?? 0);
 
     const repairingResult = await this.db
@@ -45,6 +43,19 @@ export class StatsService {
 
     const byFaultType = byFaultTypeResult.map((row) => ({
       type: row.type as FaultType,
+      count: Number(row.count),
+    }));
+
+    const byStatusResult = await this.db
+      .select({
+        status: repairOrders.status,
+        count: count(),
+      })
+      .from(repairOrders)
+      .groupBy(repairOrders.status);
+
+    const byStatus = byStatusResult.map((row) => ({
+      status: row.status as OrderStatus,
       count: Number(row.count),
     }));
 
@@ -74,6 +85,7 @@ export class StatsService {
       pending,
       repairing,
       byFaultType,
+      byStatus,
       byRepairer,
     };
   }

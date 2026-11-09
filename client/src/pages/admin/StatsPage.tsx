@@ -8,7 +8,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { statsApi } from '@client/src/api';
-import { FAULT_TYPE_LABELS, type OrderStatsResponse, type FaultType } from '@shared/api.interface';
+import { FAULT_TYPE_LABELS, ORDER_STATUS_LABELS, type OrderStatsResponse, type FaultType, type OrderStatus } from '@shared/api.interface';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/src/components/ui/card';
 
 let ReactECharts: any = null;
@@ -102,7 +102,7 @@ const StatsPage: React.FC = () => {
   ];
 
   const getFaultTypeOption = () => {
-    if (!stats) return {};
+    if (!stats || stats.byFaultType.length === 0) return {};
     const data = stats.byFaultType.map((item, idx) => ({
       name: FAULT_TYPE_LABELS[item.type as FaultType],
       value: item.count,
@@ -141,8 +141,48 @@ const StatsPage: React.FC = () => {
     };
   };
 
+  const getStatusOption = () => {
+    if (!stats || stats.byStatus.length === 0) return {};
+    const names = stats.byStatus.map((item) => ORDER_STATUS_LABELS[item.status as OrderStatus]);
+    const values = stats.byStatus.map((item) => item.count);
+    return {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true,
+      },
+      xAxis: {
+        type: 'category',
+        data: names,
+        axisLabel: { fontSize: 12, interval: 0, rotate: names.length > 5 ? 30 : 0 },
+      },
+      yAxis: {
+        type: 'value',
+        minInterval: 1,
+        axisLabel: { fontSize: 12 },
+      },
+      series: [
+        {
+          name: '工单数量',
+          type: 'bar',
+          data: values.map((val, idx) => ({
+            value: val,
+            itemStyle: { color: CHART_COLORS[idx % CHART_COLORS.length] },
+          })),
+          barWidth: '40%',
+          itemStyle: { borderRadius: [4, 4, 0, 0] },
+        },
+      ],
+    };
+  };
+
   const getRepairerOption = () => {
-    if (!stats) return {};
+    if (!stats || stats.byRepairer.length === 0) return {};
     const names = stats.byRepairer.map((item) => item.repairerName);
     const values = stats.byRepairer.map((item) => item.count);
     return {
@@ -182,7 +222,9 @@ const StatsPage: React.FC = () => {
   };
 
   const renderFaultTypeBarFallback = () => {
-    if (!stats) return null;
+    if (!stats || stats.byFaultType.length === 0) {
+      return <div className="text-muted-foreground text-center py-8">暂无统计数据</div>;
+    }
     const total = stats.byFaultType.reduce((sum, item) => sum + item.count, 0) || 1;
     return (
       <div className="space-y-3">
@@ -197,6 +239,39 @@ const StatsPage: React.FC = () => {
                 <span className="text-muted-foreground">
                   {item.count} 单 ({percent.toFixed(1)}%)
                 </span>
+              </div>
+              <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{
+                    width: `${percent}%`,
+                    backgroundColor: CHART_COLORS[idx % CHART_COLORS.length],
+                  }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const renderStatusBarFallback = () => {
+    if (!stats || stats.byStatus.length === 0) {
+      return <div className="text-muted-foreground text-center py-8">暂无统计数据</div>;
+    }
+    const maxCount = Math.max(...stats.byStatus.map((item) => item.count), 1);
+    return (
+      <div className="space-y-3">
+        {stats.byStatus.map((item, idx) => {
+          const percent = (item.count / maxCount) * 100;
+          return (
+            <div key={item.status}>
+              <div className="flex items-center justify-between text-sm mb-1">
+                <span className="text-slate-700">
+                  {ORDER_STATUS_LABELS[item.status as OrderStatus]}
+                </span>
+                <span className="text-muted-foreground">{item.count} 单</span>
               </div>
               <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
                 <div
@@ -273,6 +348,54 @@ const StatsPage: React.FC = () => {
             </Card>
           );
         })}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="rounded-lg">
+          <CardHeader>
+            <CardTitle className="text-lg">故障类型报修占比</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="flex items-center justify-center h-64 text-muted-foreground">
+                加载中...
+              </div>
+            ) : !stats || stats.byFaultType.length === 0 ? (
+              <div className="flex items-center justify-center h-64 text-muted-foreground">
+                暂无统计数据
+              </div>
+            ) : echartsImportError ? (
+              <div className="py-4">{renderFaultTypeBarFallback()}</div>
+            ) : ReactECharts ? (
+              <ReactECharts option={getFaultTypeOption()} style={{ height: '300px', width: '100%' }} />
+            ) : (
+              <div className="py-4">{renderFaultTypeBarFallback()}</div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-lg">
+          <CardHeader>
+            <CardTitle className="text-lg">工单状态分布</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <div className="flex items-center justify-center h-64 text-muted-foreground">
+                加载中...
+              </div>
+            ) : !stats || stats.byStatus.length === 0 ? (
+              <div className="flex items-center justify-center h-64 text-muted-foreground">
+                暂无统计数据
+              </div>
+            ) : echartsImportError ? (
+              <div className="py-4">{renderStatusBarFallback()}</div>
+            ) : ReactECharts ? (
+              <ReactECharts option={getStatusOption()} style={{ height: '300px', width: '100%' }} />
+            ) : (
+              <div className="py-4">{renderStatusBarFallback()}</div>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

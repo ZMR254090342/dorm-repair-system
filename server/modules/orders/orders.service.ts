@@ -232,13 +232,19 @@ export class OrdersService {
     if (o.studentId !== studentId) {
       throw new ForbiddenException('无权评价此工单');
     }
+    if (o.status === 'rejected') {
+      throw new BadRequestException('已驳回的工单不可评价');
+    }
+    if (o.status === 'cancelled') {
+      throw new BadRequestException('已取消的工单不可评价');
+    }
     if (o.status !== 'pending_review_done') {
       throw new BadRequestException('只有待评价的工单可评价');
     }
 
     const existingReview = await this.db.select().from(reviews).where(eq(reviews.orderId, dto.orderId)).limit(1);
     if (existingReview.length > 0) {
-      throw new BadRequestException('该工单已评价');
+      throw new BadRequestException('该工单已评价，不可重复评价');
     }
 
     const inserted = await this.db.insert(reviews).values({
