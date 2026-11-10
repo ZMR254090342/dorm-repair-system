@@ -33,6 +33,10 @@ const RegisterPage = () => {
       toast.error('请填写必填项');
       return;
     }
+    if (!/^\d{6,15}$/.test(form.username.trim())) {
+      toast.error('学号必须为 6-15 位纯数字');
+      return;
+    }
     if (form.password !== form.confirmPassword) {
       toast.error('两次密码输入不一致');
       return;
@@ -76,12 +80,16 @@ const RegisterPage = () => {
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="username">账号 <span className="text-destructive">*</span></Label>
+                <Label htmlFor="username">学号 <span className="text-destructive">*</span></Label>
                 <Input
                   id="username"
-                  placeholder="登录账号"
+                  placeholder="请输入学号"
                   value={form.username}
-                  onChange={(e) => handleChange('username', e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '');
+                    handleChange('username', val);
+                  }}
+                  maxLength={15}
                 />
               </div>
               <div className="space-y-1.5">

@@ -3,6 +3,7 @@ import {
   IsOptional,
   MinLength,
   MaxLength,
+  Matches,
 } from 'class-validator';
 import type { LoginRequest, RegisterRequest } from '@shared/api.interface';
 
@@ -20,6 +21,7 @@ export class LoginDto implements LoginRequest {
 export class RegisterDto implements RegisterRequest {
   @IsString()
   @MaxLength(50)
+  @Matches(/^\d{6,15}$/, { message: '学号必须为 6-15 位纯数字' })
   username!: string;
 
   @IsString()
